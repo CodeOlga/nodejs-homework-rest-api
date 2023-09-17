@@ -1,22 +1,21 @@
 const { HttpError } = require('../helpers')
 
-// Валидація даних з використанням схеми
-
 const validateBody = schema => {
   const func = (req, res, next) => {
-    const { error } = schema.validate(req.body);
+    // { abortEarly: false } - це опція, яка вказує Joi не припиняти перевірку при першій знайденій помилці
+    const { error } = schema.validate(req.body, { abortEarly: false });
 
     // Перевірка на пусте body
     if (Object.keys(req.body).length === 0) {
-      next(HttpError(400, 'missing fields'));
+      return next(HttpError(400, 'missing fields'));
     }
 
-    // Перевірка на відсутність будь-якого поля
+    // Перевіряє, чи є помилки у валідації, які повернула бібліотека Joi
     if (error) {
-    next(HttpError(400, 'missing required ' + error.details[0].context.key + ' field'));
+      const errorMessages = error.details.map(detail => detail.message).join(', ');
+      return next(HttpError(400, errorMessages));
     }
-    
-    next()
+    next();
   }
 
   return func;
