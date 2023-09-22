@@ -6,14 +6,19 @@ const validateBody = schema => {
     const { error } = schema.validate(req.body, { abortEarly: false });
 
     // Перевірка на пусте body
-    if (Object.keys(req.body).length === 0) {
-      return next(HttpError(400, 'missing fields'));
+    if (!Object.keys(req.body).length) {
+      
+      if (req.method === 'PATCH') {
+        next(HttpError(400, 'missing field favorite'));
+      }
+
+      next(HttpError(400, 'missing fields'));
     }
 
     // Перевіряє, чи є помилки у валідації, які повернула бібліотека Joi
     if (error) {
       const errorMessages = error.details.map(detail => detail.message).join(', ');
-      return next(HttpError(400, errorMessages));
+      next(HttpError(400, errorMessages));
     }
     next();
   }
