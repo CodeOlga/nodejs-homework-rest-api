@@ -1,20 +1,23 @@
 const express = require('express')
 const logger = require('morgan')
 const cors = require('cors')
+// налаштування змінних оточення для всього проету
+require('dotenv').config()
+
 const contactsRouter = require('./routes/api/contacts')
-const dotenv = require('dotenv')
+const usersRouter = require('./routes/api/users')
 
 const app = express()
 
 // налаштування як виводити в консоль, пакет morgan
 const formatsLogger = app.get('env') === 'development' ? 'dev' : 'short'
 
-// налаштування environment
-dotenv.config()
-
 app.use(logger(formatsLogger))
 app.use(cors())
 app.use(express.json())
+
+// для запитів на реєстрацію/авторизацію  використовуємо usersRouter
+app.use('/users', usersRouter)
 
 // для базового url використовуємо contactsRouter
 app.use('/api/contacts', contactsRouter)

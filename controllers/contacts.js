@@ -4,9 +4,19 @@ const { HttpError, ctrlWrapper } = require('../helpers')
 
 //  controllers
 
-const listContacts =   async (req, res) => {
-  const result = await Contact.find();
-  
+const listContacts = async (req, res) => {
+  // завдяки цьому req.user = user; в authenticate.js, тут ми маємо всю інформацію про людину, яка робить запит
+  const { _id: owner } = req.user;
+
+  // пагинація для колекції контактів (GET /contacts?page=1&limit=20)
+  const { page = 1, limit = 20, favorite } = req.query;
+  const skip = (page - 1) * limit;
+
+  // фильтрація контактів по полю favorite (GET /contacts?favorite=true)
+  const filter = { owner, favorite: favorite === 'true' };
+
+  const result = await Contact.find(filter, {skip, limit});
+
   res.status(200).json(result)
 }
 
@@ -23,17 +33,11 @@ const getContactById =   async (req, res) => {
 }
 
 const addContact = async (req, res) => {
-  const result = await Contact.create(req.body);
+  // кожний контакт буде записаний за певною людиною
+  const { _id: owner } = req.user;
+  const result = await Contact.create({...req.body, owner});
 
-  // щоб отримати об'єкт з 4-ма властивостями
-  const response = {
-    id: result.id,
-    name: req.body.name,
-    email: req.body.email,
-    phone: req.body.phone,
-  };
-
-    res.status(201).json(response);
+    res.status(201).json(result);
 }
 
 const removeContact =   async (req, res) => {
