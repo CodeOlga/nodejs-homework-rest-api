@@ -15,8 +15,9 @@ const listContacts = async (req, res) => {
   // фильтрація контактів по полю favorite (GET /contacts?favorite=true)
   const filter = { owner, favorite: favorite === 'true' };
 
-  const result = await Contact.find(filter, {skip, limit});
-
+  // { skip, limit, } повинні йти третім аргументом; можна написати null, якщо не використовуємо timestamps: true (тоді непотрібні "-createdAt -updatedAt");
+  const result = await Contact.find(filter, "-createdAt -updatedAt", {skip, limit}).populate("owner", "email");
+  
   res.status(200).json(result)
 }
 

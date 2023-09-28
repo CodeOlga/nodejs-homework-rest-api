@@ -1,5 +1,4 @@
 const { Schema, model } = require('mongoose')
-
 const { handleMongooseError } = require('../helpers')
 const { userSubscriptionEnum } = require('../constants');
 
@@ -23,7 +22,7 @@ const userSchema = new Schema({
     type: String,
     default: "",
   },
-}, { versionKey: false })
+}, { versionKey: false, timestamps: true })
 
 // middleware для обробки помилок з неправильним статусом
 userSchema.post('save', handleMongooseError)
