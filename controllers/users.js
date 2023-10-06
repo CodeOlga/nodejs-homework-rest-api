@@ -13,7 +13,7 @@ const { SECRET_KEY } = process.env;
 
 const avatarsDir = path.join(__dirname, '../', 'public', 'avatars')
 
-// signuphw
+// signup
 const register = async (req, res) => {
 // перед тим, як зареєструвати, дивимось чи є вже така людина в базі
   const { email, password } = req.body;
