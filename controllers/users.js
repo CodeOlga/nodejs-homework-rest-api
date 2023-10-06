@@ -1,12 +1,19 @@
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
-const { SECRET_KEY } = process.env;
+const gravatar = require('gravatar')
+const path = require('path')
+const fs = require('fs/promises')
+const Jimp = require('jimp');
 
 const User = require('../models/user')
 const { HttpError, ctrlWrapper } = require('../helpers')
 const { userSubscriptionEnum } = require('../constants');
 
-// signup
+const { SECRET_KEY } = process.env;
+
+const avatarsDir = path.join(__dirname, '../', 'public', 'avatars')
+
+// signuphw
 const register = async (req, res) => {
 // перед тим, як зареєструвати, дивимось чи є вже така людина в базі
   const { email, password } = req.body;
@@ -18,7 +25,10 @@ const register = async (req, res) => {
 
   const hashedPassword = await bcrypt.hash(password, 10)
 
-  const newUser = await User.create({...req.body, password: hashedPassword});
+  // генеруємо посилання на тимчасову аватарку
+  const avatarURL = gravatar.url(email)
+
+  const newUser = await User.create({...req.body, password: hashedPassword, avatarURL});
 
   res.status(201).json({
     user: {
@@ -49,12 +59,13 @@ const login = async (req, res) => {
     id: user._id,
   }
   
+  // expiresIn можна також винести в .env
   const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "23h" });
 
   // користувачу, який залогинівся, записуємо токен в базу
   await User.findByIdAndUpdate(user._id, {token})
 
-  res.json({
+  res.status(200).json({
     token,
     user: {
       email: user.email,
@@ -67,7 +78,7 @@ const login = async (req, res) => {
 const getCurrent = async (req, res) => {
   const { email, subscription} = req.user;
 
-  res.json({
+  res.status(200).json({
     email,
     subscription,
   })
@@ -100,10 +111,33 @@ const updateUserSubscription = async (req, res) => {
   res.status(200).json(updatedUser);
 };
 
+// update user avatar
+const updateAvatar = async (req, res) => {
+  const { _id } = req.user;
+  const { path: tempUpload, originalname } = req.file;
+  // створюємо унікальну назву для кожного аватара (додаємо унікальне id користувача до originalname)
+  const filename = `${_id}_${originalname}`;
+  const resultUpload = path.join(avatarsDir, filename);
+
+  // опрацьовуємо аватарку пакетом jimp
+  const originalAvatar = await Jimp.read(tempUpload);
+  await originalAvatar.resize(250, 250).writeAsync(tempUpload);
+
+    // під час переміщення аватар буде перейменований
+  await fs.rename(tempUpload, resultUpload);
+  const avatarURL = path.join('avatars', filename);
+  await User.findByIdAndUpdate(_id, { avatarURL });
+
+  res.status(200).json({
+    avatarURL,
+  })
+}
+
 module.exports = {
   register: ctrlWrapper(register),
   login: ctrlWrapper(login),
   getCurrent: ctrlWrapper(getCurrent),
   logout: ctrlWrapper(logout),
   updateUserSubscription: ctrlWrapper(updateUserSubscription),
+  updateAvatar: ctrlWrapper(updateAvatar),
 }
