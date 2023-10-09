@@ -123,7 +123,7 @@ const updateAvatar = async (req, res) => {
   const originalAvatar = await Jimp.read(tempUpload);
   await originalAvatar.resize(250, 250).writeAsync(tempUpload);
 
-    // під час переміщення аватар буде перейменований
+  // під час переміщення аватар буде перейменований
   await fs.rename(tempUpload, resultUpload);
   const avatarURL = path.join('avatars', filename);
   await User.findByIdAndUpdate(_id, { avatarURL });
