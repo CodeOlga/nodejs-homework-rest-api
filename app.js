@@ -1,7 +1,7 @@
 const express = require('express')
 const logger = require('morgan')
 const cors = require('cors')
-// налаштування змінних оточення для всього проету
+// налаштування змінних оточення для всього проекту
 require('dotenv').config()
 
 const contactsRouter = require('./routes/api/contacts')
