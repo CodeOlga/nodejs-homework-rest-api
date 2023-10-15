@@ -1,6 +1,7 @@
 const express = require('express')
 const logger = require('morgan')
 const cors = require('cors')
+
 // налаштування змінних оточення для всього проекту
 require('dotenv').config()
 
@@ -15,8 +16,8 @@ const formatsLogger = app.get('env') === 'development' ? 'dev' : 'short'
 app.use(logger(formatsLogger))
 app.use(cors())
 app.use(express.json())
-// якщо прийде запит на файли - бери його з папки public
-// "роздача статики"
+
+// "роздача статики": якщо прийде запит на файли - бери його з папки public
 app.use(express.static('public'))
 
 // для запитів на реєстрацію/авторизацію  використовуємо usersRouter

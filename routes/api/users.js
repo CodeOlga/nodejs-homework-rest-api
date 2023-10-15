@@ -8,7 +8,13 @@ const schemas = require('../../schemas/users')
 // signup
 router.post('/register', validateBody(schemas.registerSchema), ctrl.register)
 
-// signin
+// verification email
+router.get('/verify/:verificationToken', ctrl.verifyEmail)
+
+// resend email
+router.post('/verify', validateBody(schemas.emailSchema), ctrl.resendVerifyEmail)
+
+// signin(login)
 router.post('/login', validateBody(schemas.loginSchema), ctrl.login)
 
 // current
