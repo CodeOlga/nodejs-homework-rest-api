@@ -24,6 +24,7 @@ const register = async (req, res) => {
     throw HttpError(409, "Email in use")
   }
 
+   // хешування пароля користувача перед збереженням у DB (за допомогою bcrypt)
   const hashedPassword = await bcrypt.hash(password, 10)
 
   // генеруємо посилання на тимчасову аватарку

@@ -1,7 +1,7 @@
 // // ------Nodemailer-------------
 
 // const nodemailer = require("nodemailer");
-// // require('dotenv').config(); - прописано в app.js для всього проекту, тому тут непотрібно
+// require('dotenv').config(); // - прописано в app.js для всього проекту, тому тут непотрібно
 // const { META_EMAIL, META_PASSWORD } = process.env;
 
 // const nodemailerConfig = {
@@ -17,6 +17,8 @@
 // // transport - об'єкт, який буде займатися доставкою пошти
 // const transport = nodemailer.createTransport(nodemailerConfig);
 
+
+// // Універсальна функці sendEmail - отримує об'єкт data (email одержувача, тема листа та вміст), дописує відправника та відправляє email
 // const sendEmail = async(data) => {
 //     const email = {...data, from: META_EMAIL};
 //     return transport.sendMail(email);
@@ -26,7 +28,7 @@
 
 
 
-// // ------SendGrid-------------
+// ------SendGrid-------------
 
 // const sgMail = require('@sendgrid/mail');
 
